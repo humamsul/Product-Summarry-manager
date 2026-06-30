@@ -23,8 +23,8 @@ public class Product {
 
     // --- Constructor ---
     public Product(int id, String name, String category,
-                   String description, double price, double rating,
-                   String[] keywords) {
+    String description, double price, double rating,
+    String[] keywords) {
         this.id          = id;
         this.name        = name;
         this.category    = category;

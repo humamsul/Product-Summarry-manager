@@ -103,7 +103,7 @@ public class ProductManager {
      * Kompleksitas: O(K) di mana K = jumlah keyword produk tersebut.
      */
     public Product addProduct(String name, String category, String description,
-                              double price, double rating, String[] keywords) {
+    double price, double rating, String[] keywords) {
         Product p = new Product(nextId++, name, category, description, price, rating, keywords);
         catalog.add(p);
         indexProduct(p);
