@@ -310,6 +310,92 @@ public class ProductManager {
         return null;
     }
 
+    // ===========================================================
+    //  FITUR CHECKOUT
+    // ===========================================================
+    /**
+     * Hasil dari proses checkout — dibungkus dalam objek agar
+     * Main.java tidak perlu logika bisnis, cukup tampilkan hasil.
+     */
+    public static class CheckoutResult {
+        public final boolean success;
+        public final String message;
+        public final double change; // kembalian (jika sukses)
+
+        public CheckoutResult(boolean success, String message, double change) {
+            this.success = success;
+            this.message = message;
+            this.change  = change;
+        }
+    }
+
+    /**
+     * Memproses checkout untuk satu produk.
+     *
+     * Algoritma:
+     *  1. Cari produk berdasarkan ID → O(n) (linear scan di catalog)
+     *  2. Bandingkan uang yang dimasukkan vs harga produk → O(1)
+     *  3a. Jika cukup  → hapus produk dari catalog & index, hitung kembalian
+     *  3b. Jika kurang → kembalikan pesan gagal, produk TIDAK dihapus
+     *
+     * Kompleksitas total: O(n + K) di mana K = jumlah keyword produk
+     * (n untuk cari produk, K untuk bersihkan index saat penghapusan)
+     */
+    public CheckoutResult checkout(int productId, double moneyGiven) {
+        Product p = findById(productId);
+
+        if (p == null) {
+            return new CheckoutResult(false, "Produk dengan ID " + productId + " tidak ditemukan.", 0);
+        }
+
+        if (moneyGiven < p.getPrice()) {
+            double shortage = p.getPrice() - moneyGiven;
+            return new CheckoutResult(false,
+                    String.format("Maaf, uang yang Anda miliki tidak cukup. Kekurangan: Rp%,.0f", shortage),
+                    0);
+        }
+
+        // Uang cukup → proses checkout
+        double change = moneyGiven - p.getPrice();
+        removeProduct(p); // hapus dari catalog + index
+
+        String message = String.format(
+                "Payment berhasil! Anda membeli \"%s\" seharga Rp%,.0f. Kembalian: Rp%,.0f",
+                p.getName(), p.getPrice(), change);
+
+        return new CheckoutResult(true, message, change);
+    }
+
+    /**
+     * Menghapus produk dari catalog DAN dari semua index (keyword & category).
+     * Konsistensi data wajib dijaga: jika produk dihapus dari catalog tapi
+     * lupa dihapus dari index, search/sorting akan menampilkan data basi (stale).
+     *
+     * Kompleksitas: O(K) di mana K = jumlah keyword produk tersebut
+     * (catalog.remove() sendiri O(n), tapi ini wajar untuk ArrayList).
+     */
+    private void removeProduct(Product p) {
+        catalog.remove(p); // O(n) — pencarian referensi objek di ArrayList
+
+        // Bersihkan dari keywordIndex
+        for (String kw : p.getKeywords()) {
+            String key = kw.toLowerCase().trim();
+            List<Product> list = keywordIndex.get(key);
+            if (list != null) {
+                list.remove(p);
+                if (list.isEmpty()) keywordIndex.remove(key); // bersihkan bucket kosong
+            }
+        }
+
+        // Bersihkan dari categoryIndex
+        String cat = p.getCategory().toLowerCase().trim();
+        List<Product> catList = categoryIndex.get(cat);
+        if (catList != null) {
+            catList.remove(p);
+            if (catList.isEmpty()) categoryIndex.remove(cat);
+        }
+    }
+
     /** Menghasilkan bintang visual untuk rating */
     private String getStars(double rating) {
         int full  = (int) rating;

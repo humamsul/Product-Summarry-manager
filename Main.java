@@ -33,7 +33,7 @@ public class Main {
         printBanner();
         manager = new ProductManager(); // inisialisasi + load dummy data
 
-        System.out.println(GREEN + "\n Sistem berhasil diinisialisasi dengan "
+        System.out.println(GREEN + "\nSistem berhasil diinisialisasi dengan "
                 + manager.getAllProducts().size() + " produk dummy." + RESET);
 
         boolean running = true;
@@ -48,35 +48,40 @@ public class Main {
                 case 4  -> menuFilterDemo();
                 case 5  -> menuAddProduct();
                 case 6  -> menuForbiddenWords();
+                case 7  -> menuCheckout();
                 case 0  -> running = false;
-                default -> System.out.println(RED + "  Pilihan tidak valid!" + RESET);
+                default -> System.out.println(RED + "Pilihan tidak valid!" + RESET);
             }
         }
 
-        System.out.println(CYAN + "\n Terima kasih telah menggunakan Product Summary Manager!" + RESET);
+        System.out.println(CYAN + "\nTerima kasih telah menggunakan Product Summary Manager!" + RESET);
         scanner.close();
     }
 
-    //Print Main Menu
-  private static void printMainMenu() {
-    System.out.println("\n" + BOLD + CYAN + "╔══════════════════════════════════════╗");
-    System.out.println(               "║     PRODUCT SUMMARY MANAGER v1.0    ║");
-    System.out.println(               "╠══════════════════════════════════════╣" + RESET);
-    System.out.println(               "║  [1] Lihat Semua Produk              ║");
-    System.out.println(               "║  [2] Cari Produk                     ║");
-    System.out.println(               "║  [3] Katalog Terurut (Sorting)       ║");
-    System.out.println(               "║  [4] Demo Filter Kata Terlarang      ║");
-    System.out.println(               "║  [5] Tambah Produk Baru              ║");
-    System.out.println(               "║  [6] Kelola Kata Terlarang           ║");
-    System.out.println(               "║  [0] Keluar                          ║");
-    System.out.println(BOLD + CYAN +  "╚══════════════════════════════════════╝" + RESET);
+    // ===========================================================
+    //  MENU UTAMA
+    // ===========================================================
+    private static void printMainMenu() {
+        System.out.println("\n" + BOLD + CYAN + "╔══════════════════════════════════════╗");
+        System.out.println(               "║     PRODUCT SUMMARY MANAGER v1.0    ║");
+        System.out.println(               "╠══════════════════════════════════════╣" + RESET);
+        System.out.println(               "║  [1] Lihat Semua Produk              ║");
+        System.out.println(               "║  [2] Cari Produk                     ║");
+        System.out.println(               "║  [3] Katalog Terurut (Sorting)       ║");
+        System.out.println(               "║  [4] Demo Filter Kata Terlarang      ║");
+        System.out.println(               "║  [5] Tambah Produk Baru              ║");
+        System.out.println(               "║  [6] Kelola Kata Terlarang           ║");
+        System.out.println(               "║  [7] Checkout / Beli Produk          ║");
+        System.out.println(               "║  [0] Keluar                          ║");
+        System.out.println(BOLD + CYAN +  "╚══════════════════════════════════════╝" + RESET);
     }
+
     // ===========================================================
     //  MENU 1 — KATALOG SEMUA PRODUK
     // ===========================================================
     private static void menuCatalog() {
         List<Product> products = manager.getAllProducts();
-        printHeader("📦 KATALOG SEMUA PRODUK (" + products.size() + " item)");
+        printHeader("KATALOG SEMUA PRODUK (" + products.size() + " item)");
 
         if (products.isEmpty()) {
             System.out.println("Belum ada produk.");
@@ -104,7 +109,7 @@ public class Main {
     //  MENU 2 — PENCARIAN
     // ===========================================================
     private static void menuSearch() {
-        printHeader("🔍 PENCARIAN PRODUK");
+        printHeader("PENCARIAN PRODUK");
         System.out.println("  [1] Cari berdasarkan Keyword");
         System.out.println("  [2] Cari berdasarkan Kategori");
         System.out.println("  [0] Kembali");
@@ -119,7 +124,7 @@ public class Main {
                 List<Product> results = manager.searchByKeyword(kw);
                 long elapsed = System.nanoTime() - start;
 
-                printHeader("🔍 HASIL PENCARIAN KEYWORD: \"" + kw + "\"");
+                printHeader("HASIL PENCARIAN KEYWORD: \"" + kw + "\"");
                 if (results.isEmpty()) {
                     System.out.println("Tidak ada produk yang cocok.");
                 } else {
@@ -134,7 +139,7 @@ public class Main {
                 String cat = scanner.nextLine().trim();
                 List<Product> results = manager.searchByCategory(cat);
 
-                printHeader("🔍 HASIL PENCARIAN KATEGORI: \"" + cat + "\"");
+                printHeader("HASIL PENCARIAN KATEGORI: \"" + cat + "\"");
                 if (results.isEmpty()) {
                     System.out.println("Tidak ada produk dalam kategori ini.");
                 } else {
@@ -150,9 +155,9 @@ public class Main {
     //  MENU 3 — SORTING
     // ===========================================================
     private static void menuSorting() {
-        printHeader("📊 KATALOG TERURUT");
-        System.out.println("  [1]  Urutkan berdasarkan Rating Tertinggi");
-        System.out.println("  [2]  Urutkan berdasarkan Harga Termurah");
+        printHeader("KATALOG TERURUT");
+        System.out.println("  [1] ⭐ Urutkan berdasarkan Rating Tertinggi");
+        System.out.println("  [2] 💰 Urutkan berdasarkan Harga Termurah");
         System.out.println("  [0] Kembali");
 
         int choice = readInt("Pilih: ");
@@ -163,9 +168,9 @@ public class Main {
                 List<Product> sorted = manager.getSortedByRatingDesc();
                 long elapsed = System.nanoTime() - start;
 
-                printHeader(" RANKING PRODUK (Rating Tertinggi → Terendah)");
+                printHeader("⭐ RANKING PRODUK (Rating Tertinggi → Terendah)");
                 printRankedList(sorted);
-                System.out.printf(YELLOW + "%n⏱  Sorting selesai dalam: %.3f ms (Timsort O(n log n))%n" + RESET,
+                System.out.printf(YELLOW + "%n⏱️  Sorting selesai dalam: %.3f ms (Timsort O(n log n))%n" + RESET,
                         elapsed / 1_000_000.0);
             }
             case 2 -> {
@@ -173,9 +178,9 @@ public class Main {
                 List<Product> sorted = manager.getSortedByPriceAsc();
                 long elapsed = System.nanoTime() - start;
 
-                printHeader(" PRODUK TERMURAH (Harga Terendah → Tertinggi)");
+                printHeader("💰 PRODUK TERMURAH (Harga Terendah → Tertinggi)");
                 printRankedList(sorted);
-                System.out.printf(YELLOW + "%n⏱  Sorting selesai dalam: %.3f ms (PriorityQueue Min-Heap O(n log n))%n" + RESET,
+                System.out.printf(YELLOW + "%n⏱️  Sorting selesai dalam: %.3f ms (PriorityQueue Min-Heap O(n log n))%n" + RESET,
                         elapsed / 1_000_000.0);
             }
             case 0 -> { /* kembali */ }
@@ -187,7 +192,7 @@ public class Main {
     //  MENU 4 — DEMO FILTER KATA TERLARANG
     // ===========================================================
     private static void menuFilterDemo() {
-        printHeader("🔐 DEMO FILTER KATA TERLARANG");
+        printHeader("DEMO FILTER KATA TERLARANG");
         System.out.println("Produk berikut mengandung kata terlarang dalam deskripsinya:");
         System.out.println("(Deskripsi RAW vs Deskripsi TERSENSOR akan ditampilkan)\n");
 
@@ -208,7 +213,7 @@ public class Main {
 
         if (count == 0) System.out.println("Tidak ada produk dengan kata terlarang.");
 
-        System.out.println(YELLOW + "\n💡 TIP: Coba ketikkan deskripsi sendiri untuk difilter!" + RESET);
+        System.out.println(YELLOW + "\nTIP: Coba ketikkan deskripsi sendiri untuk difilter!" + RESET);
         System.out.print("Masukkan teks (Enter langsung = lewati): ");
         String input = scanner.nextLine().trim();
         if (!input.isEmpty()) {
@@ -243,7 +248,7 @@ public class Main {
         }
 
         Product newProduct = manager.addProduct(name, category, desc, price, rating, keywords);
-        System.out.println(GREEN + "\n Produk berhasil ditambahkan:" + RESET);
+        System.out.println(GREEN + "\nProduk berhasil ditambahkan:" + RESET);
         System.out.println("   " + newProduct);
     }
 
@@ -277,15 +282,68 @@ public class Main {
     }
 
     // ===========================================================
+    //  MENU 7 — CHECKOUT / BELI PRODUK
+    // ===========================================================
+    /**
+     * Alur checkout:
+     *  1. Tampilkan katalog agar user pilih produk via ID
+     *  2. User masukkan nominal uang yang dimiliki
+     *  3. ProductManager.checkout() menentukan sukses/gagal
+     *  4. Jika sukses → produk otomatis hilang dari katalog (lihat removeProduct)
+     *  5. Tampilkan struk pembayaran / pesan gagal
+     */
+    private static void menuCheckout() {
+        printHeader("CHECKOUT / BELI PRODUK");
+
+        List<Product> products = manager.getAllProducts();
+        if (products.isEmpty()) {
+            System.out.println("Katalog kosong, tidak ada produk untuk di-checkout.");
+            return;
+        }
+
+        System.out.println("Daftar produk yang tersedia:");
+        for (Product p : products) {
+            System.out.println("  → " + p);
+        }
+
+        int id = readInt("\nMasukkan ID produk yang ingin dibeli (0 = batal): ");
+        if (id == 0) return;
+
+        Product target = manager.findById(id);
+        if (target == null) {
+            System.out.println(RED + "Produk dengan ID " + id + " tidak ditemukan." + RESET);
+            return;
+        }
+
+        System.out.printf("Anda memilih: %s (Harga: Rp%,.0f)%n", target.getName(), target.getPrice());
+        double money = readDouble("Masukkan jumlah uang Anda (Rp): ");
+
+        // Logika checkout sepenuhnya ada di ProductManager (Separation of Concerns)
+        ProductManager.CheckoutResult result = manager.checkout(id, money);
+
+        System.out.println();
+        if (result.success) {
+            System.out.println(GREEN + "============================================" + RESET);
+            System.out.println(GREEN + "  " + result.message + RESET);
+            System.out.println(GREEN + "============================================" + RESET);
+            System.out.println("Sisa produk di katalog: " + manager.getAllProducts().size());
+        } else {
+            System.out.println(RED + "============================================" + RESET);
+            System.out.println(RED + "  " + result.message + RESET);
+            System.out.println(RED + "============================================" + RESET);
+        }
+    }
+
+    // ===========================================================
     //  HELPER METHODS
     // ===========================================================
     private static void printBanner() {
         System.out.println(BOLD + BLUE);
         System.out.println("  ╔═══════════════════════════════════════════════════╗");
-        System.out.println("  ║       PRODUCT SUMMARY MANAGER SYSTEM v1.0         ║");
-        System.out.println("  ║    Tugas Kelompok — Pemrograman Java / CLI        ║");
+        System.out.println("  ║       PRODUCT SUMMARY MANAGER SYSTEM v1.0        ║");
+        System.out.println("  ║    Tugas Kelompok - Struktur Data & Algoritma     ║");
         System.out.println("  ╠═══════════════════════════════════════════════════╣");
-        System.out.println("  ║  Fitur: Indexing | Filter Kata | Sorting Katalog  ║");
+        System.out.println("  ║  Fitur: Indexing | Filter Kata | Sorting | Checkout║");
         System.out.println("  ╚═══════════════════════════════════════════════════╝");
         System.out.println(RESET);
     }
@@ -315,7 +373,7 @@ public class Main {
                 int val = Integer.parseInt(scanner.nextLine().trim());
                 return val;
             } catch (NumberFormatException e) {
-                System.out.println(RED + "⚠️  Masukkan angka yang valid!" + RESET);
+                System.out.println(RED + "Masukkan angka yang valid!" + RESET);
             }
         }
     }
